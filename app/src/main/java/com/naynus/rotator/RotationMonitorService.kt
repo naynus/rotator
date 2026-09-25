@@ -7,14 +7,15 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
+import android.view.Display
 import android.view.OrientationEventListener
 import android.view.Surface
-import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 
 class RotationMonitorService : Service() {
@@ -75,8 +76,9 @@ class RotationMonitorService : Service() {
     }
 
     private fun currentRotationBucket(): Int {
-        val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        return when (windowManager.defaultDisplay.rotation) {
+        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+        return when (display.rotation) {
             Surface.ROTATION_0 -> 0
             Surface.ROTATION_90 -> 90
             Surface.ROTATION_180 -> 180
