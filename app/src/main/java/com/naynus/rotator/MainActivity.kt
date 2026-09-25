@@ -94,8 +94,8 @@ class MainActivity : AppCompatActivity() {
             if (RotationMonitorService.isRunning) R.string.action_stop_service else R.string.action_start_service
         )
         binding.buttonToggleService.isEnabled =
-            RotationMonitorService.isRunning || (overlayGranted && writeSettingsGranted && notificationGranted)
+            RotationMonitorService.isRunning || (overlayGranted && writeSettingsGranted)
         binding.textPermissionsHint.visibility =
-            if (!overlayGranted || !writeSettingsGranted || !notificationGranted) android.view.View.VISIBLE else android.view.View.GONE
+            if (!overlayGranted || !writeSettingsGranted) android.view.View.VISIBLE else android.view.View.GONE
     }
 }
