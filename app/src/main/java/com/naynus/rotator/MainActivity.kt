@@ -1,16 +1,24 @@
 package com.naynus.rotator
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.naynus.rotator.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val notificationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { refreshStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +44,13 @@ class MainActivity : AppCompatActivity() {
         binding.buttonToggleService.setOnClickListener {
             if (RotationMonitorService.isRunning) {
                 stopService(Intent(this, RotationMonitorService::class.java))
-            } else {
-                if (hasOverlayPermission() && hasWriteSettingsPermission()) {
-                    startForegroundService(Intent(this, RotationMonitorService::class.java))
-                }
+                refreshStatus()
+            } else if (!hasNotificationPermission()) {
+                notificationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else if (hasOverlayPermission() && hasWriteSettingsPermission()) {
+                startForegroundService(Intent(this, RotationMonitorService::class.java))
+                refreshStatus()
             }
-            refreshStatus()
         }
     }
 
@@ -56,12 +65,18 @@ class MainActivity : AppCompatActivity() {
     private fun hasWriteSettingsPermission(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.System.canWrite(this)
 
+    private fun hasNotificationPermission(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+
     private fun isAutoRotateOn(): Boolean =
         Settings.System.getInt(contentResolver, Settings.System.ACCELEROMETER_ROTATION, 0) == 1
 
     private fun refreshStatus() {
         val overlayGranted = hasOverlayPermission()
         val writeSettingsGranted = hasWriteSettingsPermission()
+        val notificationGranted = hasNotificationPermission()
 
         binding.textOverlayStatus.setText(
             if (overlayGranted) R.string.status_overlay_granted else R.string.status_overlay_missing
@@ -78,8 +93,9 @@ class MainActivity : AppCompatActivity() {
         binding.buttonToggleService.setText(
             if (RotationMonitorService.isRunning) R.string.action_stop_service else R.string.action_start_service
         )
-        binding.buttonToggleService.isEnabled = RotationMonitorService.isRunning || (overlayGranted && writeSettingsGranted)
+        binding.buttonToggleService.isEnabled =
+            RotationMonitorService.isRunning || (overlayGranted && writeSettingsGranted && notificationGranted)
         binding.textPermissionsHint.visibility =
-            if (!overlayGranted || !writeSettingsGranted) android.view.View.VISIBLE else android.view.View.GONE
+            if (!overlayGranted || !writeSettingsGranted || !notificationGranted) android.view.View.VISIBLE else android.view.View.GONE
     }
 }
