@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotator</string>
+
+    <string name="status_overlay_granted">Overlay permission: granted</string>
+    <string name="status_overlay_missing">Overlay permission: missing</string>
+    <string name="status_write_settings_granted">Write settings permission: granted</string>
+    <string name="status_write_settings_missing">Write settings permission: missing</string>
+    <string name="status_service_running">Monitor: running</string>
+    <string name="status_service_stopped">Monitor: stopped</string>
+    <string name="status_auto_rotate_on">System auto-rotate: on</string>
+    <string name="status_auto_rotate_off">System auto-rotate: off</string>
+
+    <string name="action_grant_overlay">Grant overlay permission</string>
+    <string name="action_grant_write_settings">Grant write settings permission</string>
+    <string name="action_start_service">Start monitor</string>
+    <string name="action_stop_service">Stop monitor</string>
+
+    <string name="hint_permissions_required">Grant both permissions above before starting the monitor.</string>
+    <string name="hint_how_it_works">When you turn the phone, a floating button appears. Tap it to rotate the screen to match. Ignore it to keep the current orientation.</string>
+
+    <string name="notification_channel_name">Rotation monitor</string>
+    <string name="notification_title">Rotator is watching for orientation changes</string>
+    <string name="notification_text">Tap the floating button when it appears to confirm a rotation</string>
+
+    <string name="overlay_button_description">Confirm screen rotation</string>
+</resources>
